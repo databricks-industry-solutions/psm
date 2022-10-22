@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md 
+# MAGIC You may find this series of notebooks at https://github.com/databricks-industry-solutions/psm. For more information about this solution accelerator, visit https://www.databricks.com/blog/2020/10/20/detecting-at-risk-patients-with-real-world-data.html.
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Data preparation and QC
 # MAGIC In this notebook we start by creating cohorts based on our study design using synthea resources that are already loaded into delta (using `1-data-ingest` notebook).

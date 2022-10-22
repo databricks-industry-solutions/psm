@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md 
+# MAGIC You may find this series of notebooks at https://github.com/databricks-industry-solutions/psm. For more information about this solution accelerator, visit https://www.databricks.com/blog/2020/10/20/detecting-at-risk-patients-with-real-world-data.html.
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Propensity score matching
 # MAGIC Now that we have created the dataset needed for our analysis, in this notebook, we show how to perform propnecity score matching by training a classifier that assignes the probability of receiving a treatment based on patient's demographic information and past conditions. 
