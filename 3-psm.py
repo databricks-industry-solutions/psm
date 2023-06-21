@@ -27,7 +27,6 @@ from pprint import pprint
 # COMMAND ----------
 
 # DBTITLE 1,configuration
-project_name='psm'
 with open(f'/tmp/{project_name}_configs.json','r') as f:
     settings = json.load(f)
     data_path = settings['data_path']
@@ -217,7 +216,7 @@ fig.show()
 # MAGIC ### PSM Method 1: Stratification
 # MAGIC There are two main approaches for propencity score matching. First we apply the stratification method:
 # MAGIC > Stratification on the propensity score involves stratifying subjects into mutually exclusive subsets based on their estimated propensity score. Subjects are ranked according to their estimated propensity score.
-# MAGIC 
+# MAGIC
 # MAGIC see [An Introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3144483/) for more information.
 # MAGIC We use [QuantileDiscretizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.QuantileDiscretizer.html#pyspark.ml.feature.QuantileDiscretizer.inputCols) to cretae different buckets for propencity scores
 
@@ -267,9 +266,9 @@ stratified_outcomes_df.groupBy(f'is_{target_treatment}','p_strata').agg(avg(f'is
 # MAGIC ### PSM Method 1: Nearest Neighbor Method
 # MAGIC Another method for estimnating the treatment effects and taking into account propencity scores, is to use the nearest neighbor method:
 # MAGIC >Nearest neighbor matching selects for matching to a given treated subject that untreated subject whose propensity score is closest to that of the treated subject. If multiple untreated subjects have propensity scores that are equally close to that of the treated subject, one of these untreated subjects is selected at random.
-# MAGIC 
+# MAGIC
 # MAGIC see [this review](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3144483/#R66) for more information on this method.
-# MAGIC 
+# MAGIC
 # MAGIC Note that finding the nearest neighbor based on propencity scores requires pairwise comparsion of samples which can be computationaly expensive especially if we have a large sample size. Thankfully, when we leverage distributed computing with spark we can can easily find pairwise matches at scale.
 
 # COMMAND ----------
@@ -314,7 +313,7 @@ pairs=(
 
 # COMMAND ----------
 
-pairs.write.mode('overWrite').save(f'{delta_path}/gold/nn-pairs')
+pairs.write.mode('overWrite').option('overwriteSchema', 'true').save(f'{delta_path}/gold/nn-pairs')
 
 # COMMAND ----------
 
@@ -359,23 +358,23 @@ display(df)
 
 # MAGIC %md
 # MAGIC For simplicity let's use the following notaions:
-# MAGIC 
+# MAGIC
 # MAGIC - `a=n(11)` : number of pairs in which both the treated and the untreated subjects experience the event}
 # MAGIC - `b=n(10)`: number of pairs in which the treated subject experiences the event, whereas the untreated subject does not
 # MAGIC - `c=n(01)`: number of pairs in which the untreated subject experiences the event, whereas the treated subject does not
 # MAGIC - `d=n(00)`: number of pairs in which both the treated and the untreated subjects do not experience the event
-# MAGIC 
+# MAGIC
 # MAGIC The difference in the probability of the event between the treated and the untreated subjects is estimated by
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC \\[p_2-p_1 = (b-c)/n,\\]
-# MAGIC 
+# MAGIC
 # MAGIC where `n` is the number of matched pairs and \\(p_2,p_1\\) are proportions of addmitted and not admitted patinets respectively.
-# MAGIC 
+# MAGIC
 # MAGIC The variance of the difference in proportions is estimated by
-# MAGIC 
+# MAGIC
 # MAGIC \\[v=\frac{(b+c)-(c-b)^2/n}{n^2} \\]
-# MAGIC 
+# MAGIC
 # MAGIC see [Effects and non-effects of paired identical observations in comparing proportions with binary matched-pairs data](https://pubmed.ncbi.nlm.nih.gov/14695640/) for more details.
 
 # COMMAND ----------

@@ -18,10 +18,6 @@ import json
 
 # COMMAND ----------
 
-project_name='psm'
-
-# COMMAND ----------
-
 # MAGIC %run ./config/00-config
 
 # COMMAND ----------
@@ -61,7 +57,7 @@ for dataset in tqdm(datasets):
     print(f'\nreading {dataset}\n')
     df=spark.read.csv(f'{synthea_path}/{dataset}',header=True,inferSchema=True)
     print(f'writing {dataset} to delta')
-    df.write.mode("overwrite").save(f'{delta_bronze_path}/{dataset}')
+    df.write.mode("overwrite").option("overwriteSchema", "true").save(f'{delta_bronze_path}/{dataset}')
     df.createOrReplaceTempView(dataset)
 
 # COMMAND ----------
@@ -75,7 +71,7 @@ display(pd.DataFrame(table_counts,columns=['dataset','n_records']).sort_values(b
 
 # MAGIC %md
 # MAGIC Copyright / License info of the notebook. Copyright Databricks, Inc. [2021].  The source in this notebook is provided subject to the [Databricks License](https://databricks.com/db-license-source).  All included or referenced third party libraries are subject to the licenses set forth below.
-# MAGIC 
+# MAGIC
 # MAGIC |Library Name|Library License|Library License URL|Library Source URL| 
 # MAGIC | :-: | :-:| :-: | :-:|
 # MAGIC |Smolder |Apache-2.0 License| https://github.com/databrickslabs/smolder | https://github.com/databrickslabs/smolder/blob/master/LICENSE|

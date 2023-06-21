@@ -16,7 +16,7 @@
 
 # COMMAND ----------
 
-project_name='psm'
+# MAGIC %run ./config/00-config
 
 # COMMAND ----------
 
@@ -106,13 +106,13 @@ delta_ehr.set_patient_list(demog_list=['BIRTHDATE','MARITAL','RACE','ETHNICITY',
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC Now we add cohorts based on prior events (comorbidities, drug exposure etc). For each comorbid condition of interest, we choose a window of time 
 # MAGIC to go back and look for any record of diagnosis of, or exposure to, of a condition of interest. This is done simply by using the `add_cohort` method 
 # MAGIC defined in `DeltaEHR` class. This method also allows you to specify a washout window (`gate_window`) as a buffer in cases where we want to ensure effects of treatments do not interfere. For example if this is specified to
 # MAGIC 10 days, then if there is an instance of a comorbidity diagnosis within 10 dyas of the target ourcome, we do not inlcude that event. Note that
 # MAGIC if you speciy a negative value for the washout window you can include evnets occuring after the target event (see below)
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://drive.google.com/uc?export=view&id=1O2OmMrJS97FvX1lzrc4xOck5mii1c5cm" width=700>
 
 # COMMAND ----------
@@ -135,7 +135,7 @@ delta_ehr.add_cohort('medications', target_params['target_med_name'], target_par
 
 # MAGIC %md
 # MAGIC Optionally you can also add cohorts correspodning to other treatments, for example:
-# MAGIC 
+# MAGIC
 # MAGIC ```
 # MAGIC meds_test=(
 # MAGIC   delta_ehr.tables['medications'].filter("to_date(START) > to_date('2020-01 01')")
@@ -148,7 +148,7 @@ delta_ehr.add_cohort('medications', target_params['target_med_name'], target_par
 # MAGIC   .limit(20)
 # MAGIC   .collect()
 # MAGIC )
-# MAGIC 
+# MAGIC
 # MAGIC medications={f"m_{m['CODE']}":m['CODE'] for m in meds_test}
 # MAGIC for med,codes in list(medications.items()):
 # MAGIC   delta_ehr.add_cohort('medications', med, codes,0,-10, 'covid')
@@ -230,7 +230,7 @@ fig.show()
 
 # DBTITLE 1,Blood clots by age and gender
 # MAGIC %sql
-# MAGIC 
+# MAGIC
 # MAGIC SELECT gender,
 # MAGIC        age_at_blood_clot,
 # MAGIC        count(*) as count
@@ -266,4 +266,4 @@ data_df.filter(f"is_{target_params['target_event_name']}==1")\
 
 # COMMAND ----------
 
-data_df.write.mode('overwrite').save(f"{delta_path}/silver/patient_data")
+data_df.write.mode('overwrite').option("overwriteSchema", "true").save(f"{delta_path}/silver/patient_data")
